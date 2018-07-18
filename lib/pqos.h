@@ -57,9 +57,88 @@ extern "C" {
  * =======================================
  */
 
+/**
+ * Allocation & Monitoring association MSR register
+ * - bits [63..32] QE COS
+ * - bits [31..10] Reserved
+ * - bits [9..0] RMID
+ */
+#define PQOS_MSR_ASSOC             0xC8F
+#define PQOS_MSR_ASSOC_QECOS_SHIFT 32
+#define PQOS_MSR_ASSOC_QECOS_MASK  0xffffffff00000000ULL
+#define PQOS_MSR_ASSOC_RMID_MASK   ((1ULL << 10) - 1ULL)
+
+/**
+ * Allocation class of service (COS) MSR registers
+ */
+#define PQOS_MSR_L3CA_MASK_START 0xC90
+#define PQOS_MSR_L3CA_MASK_END   0xD0F
+#define PQOS_MSR_L3CA_MASK_NUMOF                                \
+        (PQOS_MSR_L3CA_MASK_END - PQOS_MSR_L3CA_MASK_START + 1)
+
+#define PQOS_MSR_L2CA_MASK_START 0xD10
+#define PQOS_MSR_MBA_MASK_START  0xD50
+
+#define PQOS_MSR_L3_QOS_CFG          0xC81   /**< L3 CAT config register */
+#define PQOS_MSR_L3_QOS_CFG_CDP_EN   1ULL    /**< L3 CDP enable bit */
+
+#define PQOS_MSR_L2_QOS_CFG          0xC82   /**< L2 CAT config register */
+#define PQOS_MSR_L2_QOS_CFG_CDP_EN   1ULL    /**< L2 CDP enable bit */
+
+/**
+ * MBA linear max value
+ */
+#define PQOS_MBA_LINEAR_MAX 100
+
 #define PQOS_VERSION       20100        /**< version 2.1.0 */
 #define PQOS_MAX_L3CA_COS  16           /**< 16 x COS */
 #define PQOS_MAX_L2CA_COS  16           /**< 16 x COS */
+
+/**
+ * Available types of allocation resource ID's.
+ * (matches CPUID enumeration)
+ */
+#define PQOS_RES_ID_L3_ALLOCATION    1       /**< L3 cache allocation */
+#define PQOS_RES_ID_L2_ALLOCATION    2       /**< L2 cache allocation */
+#define PQOS_RES_ID_MB_ALLOCATION    3       /**< Memory BW allocation */
+
+#define PQOS_CPUID_CAT_CDP_BIT       2       /**< CDP supported bit */
+
+/**
+ * Monitoring data read MSR register
+ */
+#define PQOS_MSR_MON_QMC             0xC8E
+#define PQOS_MSR_MON_QMC_DATA_MASK   ((1ULL << 62) - 1ULL)
+#define PQOS_MSR_MON_QMC_ERROR       (1ULL << 63)
+#define PQOS_MSR_MON_QMC_UNAVAILABLE (1ULL << 62)
+
+/**
+ * Monitoring event selection MSR register
+ * - bits [63..42] Reserved
+ * - bits [41..32] RMID
+ * - bits [31..8] Reserved
+ * - bits [7..0] Event ID
+ */
+#define PQOS_MSR_MON_EVTSEL            0xC8D
+#define PQOS_MSR_MON_EVTSEL_RMID_SHIFT 32
+#define PQOS_MSR_MON_EVTSEL_RMID_MASK  ((1ULL << 10) - 1ULL)
+#define PQOS_MSR_MON_EVTSEL_EVTID_MASK ((1ULL << 8) - 1ULL)
+
+/**
+ * MSR's to read instructions retired, unhalted cycles,
+ * LLC references and LLC misses.
+ * These MSR's are needed to calculate IPC (instructions per clock) and
+ * LLC miss ratio.
+ */
+#define IA32_MSR_INST_RETIRED_ANY     0x309
+#define IA32_MSR_CPU_UNHALTED_THREAD  0x30A
+#define IA32_MSR_FIXED_CTR_CTRL       0x38D
+#define IA32_MSR_PERF_GLOBAL_CTRL     0x38F
+#define IA32_MSR_PMC0                 0x0C1
+#define IA32_MSR_PERFEVTSEL0          0x186
+
+#define IA32_EVENT_LLC_MISS_MASK      0x2EULL
+#define IA32_EVENT_LLC_MISS_UMASK     0x41ULL
 
 /*
  * =======================================
