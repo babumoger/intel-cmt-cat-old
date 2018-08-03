@@ -53,6 +53,8 @@
 #include "cpuinfo.h"
 #include "types.h"
 #include "machine.h"
+#include "os_allocation.h"
+#include "allocation.h"
 
 /**
  * This structure will be made externally available
@@ -464,6 +466,47 @@ cpuinfo_build_topo(void)
 
         return l_cpu;
 }
+
+/**
+ * These functions are not part of the library.
+ * Lets define it as weak. It will be replaced during the link if
+ * the function definition is available
+ */
+void __attribute__((weak)) alloc_print_config (const struct pqos_capability *cap_mon,
+					       const struct pqos_capability *cap_l3ca,
+					       const struct pqos_capability *cap_l2ca,
+					       const struct pqos_capability *cap_mba,
+					       const unsigned sock_count,
+					       const unsigned *sockets,
+					       const struct pqos_cpuinfo *cpu_info,
+					       const int verbose);
+
+/**
+ * Initialize pointers for the vendors
+ */
+int
+init_functions(struct pqos_vendor_config **ptr)
+{
+        *ptr = malloc(sizeof(struct pqos_vendor_config));
+        if (*ptr == NULL) {
+                LOG_ERROR("init_pointers: malloc failed!");
+                return -EFAULT;
+        }
+
+	(*ptr)->cpuid_cache_leaf = 4;
+	(*ptr)->default_mba = PQOS_MBA_LINEAR_MAX;
+	(*ptr)->mba_msr_reg = PQOS_MSR_MBA_MASK_START;
+	(*ptr)->hw_mba_get = hw_mba_get;
+	(*ptr)->hw_mba_set = hw_mba_set;
+	(*ptr)->os_mba_get = os_mba_get;
+	(*ptr)->os_mba_set = os_mba_set;
+	(*ptr)->discover_alloc_mba = discover_alloc_mba;
+	(*ptr)->pqos_get_resource_id = pqos_get_resource_id_socket;
+	(*ptr)->alloc_print_config = alloc_print_config;
+
+        return 0;
+}
+
 
 /**
  * Detect number of logical processors on the machine

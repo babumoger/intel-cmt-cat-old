@@ -57,6 +57,11 @@ extern "C" {
  * =======================================
  */
 
+/*
+ * This is a grobal structure to store all the vendor defines
+ */
+struct pqos_vendor_config *v_def;
+
 /**
  * Allocation & Monitoring association MSR register
  * - bits [63..32] QE COS
