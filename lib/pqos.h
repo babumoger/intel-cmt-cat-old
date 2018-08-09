@@ -418,6 +418,17 @@ struct pqos_cpuinfo {
 };
 
 /**
+ * @brief Discovers MBA
+ *
+ * @param r_cap place to store MBA capabilities structure
+ *
+ * @return Operation status
+ * @retval PQOS_RETVAL_OK success
+ */
+int discover_alloc_mba(struct pqos_cap_mba **r_cap);
+
+
+/**
  * @brief Retrieves PQoS capabilities data
  *
  * @param [out] cap location to store PQoS capabilities information at
