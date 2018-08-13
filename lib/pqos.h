@@ -84,6 +84,11 @@ struct pqos_vendor_config *v_def;
 #define PQOS_MSR_L2CA_MASK_START 0xD10
 #define PQOS_MSR_MBA_MASK_START  0xD50
 
+/**
+ * MBA Allocation class of service (COS) MSR register for AMD
+ */
+#define PQOS_MSR_MBA_MASK_START_AMD  0xC0000200
+
 #define PQOS_MSR_L3_QOS_CFG          0xC81   /**< L3 CAT config register */
 #define PQOS_MSR_L3_QOS_CFG_CDP_EN   1ULL    /**< L3 CDP enable bit */
 
@@ -94,6 +99,11 @@ struct pqos_vendor_config *v_def;
  * MBA linear max value
  */
 #define PQOS_MBA_LINEAR_MAX 100
+
+/**
+ * MBA max value for AMD
+ */
+#define PQOS_MBA_MAX_AMD 0x800
 
 #define PQOS_VERSION       20100        /**< version 2.1.0 */
 #define PQOS_MAX_L3CA_COS  16           /**< 16 x COS */
