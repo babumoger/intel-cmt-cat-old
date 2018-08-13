@@ -55,6 +55,32 @@
 static int m_interface = PQOS_INTER_MSR;
 
 
+/**
+ * @brief Gets the resource id(or socket id) for the core
+ *
+ * @param pqos_coreinfo core structure
+ *
+ * @return Operation status
+ * @retval PQOS_RETVAL_OK success
+ */
+unsigned pqos_get_resource_id_socket(const struct pqos_coreinfo *coreinfo)
+{
+	return coreinfo->socket;
+}
+
+/**
+ * @brief Gets the resource id(or l3 id) for the core
+ *
+ * @param pqos_coreinfo core structure
+ *
+ * @return Operation status
+ * @retval PQOS_RETVAL_OK success
+ */
+unsigned pqos_get_resource_id_l3_id(const struct pqos_coreinfo *coreinfo)
+{
+	return coreinfo->l3_id;
+}
+
 int
 _pqos_utils_init(int interface)
 {

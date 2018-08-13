@@ -418,6 +418,26 @@ struct pqos_cpuinfo {
 };
 
 /**
+ * @brief Gets the resource id(or socket id) for the core
+ *
+ * @param pqos_coreinfo core structure
+ *
+ * @return Operation status
+ * @retval PQOS_RETVAL_OK success
+ */
+unsigned pqos_get_resource_id_socket(const struct pqos_coreinfo *coreinfo);
+
+/**
+ * @brief Gets the resource id(or l3_id) for the core
+ *
+ * @param pqos_coreinfo core structure
+ *
+ * @return Operation status
+ * @retval PQOS_RETVAL_OK success
+ */
+unsigned pqos_get_resource_id_l3_id(const struct pqos_coreinfo *coreinfo);
+
+/**
  * @brief Discovers MBA
  *
  * @param r_cap place to store MBA capabilities structure
