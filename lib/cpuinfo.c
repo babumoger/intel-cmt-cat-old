@@ -514,6 +514,14 @@ void __attribute__((weak)) alloc_print_config (const struct pqos_capability *cap
 					       const unsigned *sockets,
 					       const struct pqos_cpuinfo *cpu_info,
 					       const int verbose);
+void __attribute__((weak)) alloc_print_config_amd(const struct pqos_capability *cap_mon,
+					       const struct pqos_capability *cap_l3ca,
+					       const struct pqos_capability *cap_l2ca,
+					       const struct pqos_capability *cap_mba,
+					       const unsigned sock_count,
+					       const unsigned *sockets,
+					       const struct pqos_cpuinfo *cpu_info,
+					       const int verbose);
 
 /**
  * Initialize pointers for the vendors
@@ -521,24 +529,41 @@ void __attribute__((weak)) alloc_print_config (const struct pqos_capability *cap
 int
 init_functions(struct pqos_vendor_config **ptr)
 {
-        *ptr = malloc(sizeof(struct pqos_vendor_config));
-        if (*ptr == NULL) {
-                LOG_ERROR("init_pointers: malloc failed!");
-                return -EFAULT;
-        }
+	*ptr = malloc(sizeof(struct pqos_vendor_config));
+	if (*ptr == NULL) {
+		LOG_ERROR("init_pointers: malloc failed!");
+		return -EFAULT;
+	}
 
-	(*ptr)->cpuid_cache_leaf = 4;
-	(*ptr)->default_mba = PQOS_MBA_LINEAR_MAX;
-	(*ptr)->mba_msr_reg = PQOS_MSR_MBA_MASK_START;
-	(*ptr)->hw_mba_get = hw_mba_get;
-	(*ptr)->hw_mba_set = hw_mba_set;
-	(*ptr)->os_mba_get = os_mba_get;
-	(*ptr)->os_mba_set = os_mba_set;
-	(*ptr)->discover_alloc_mba = discover_alloc_mba;
-	(*ptr)->pqos_get_resource_id = pqos_get_resource_id_socket;
-	(*ptr)->alloc_print_config = alloc_print_config;
+	/**
+	 * Make sure to initialize all the pointers to avoid
+	 * NULL check while calling
+	 */
+	if (is_intel()) {
+		(*ptr)->cpuid_cache_leaf = 4;
+		(*ptr)->default_mba = PQOS_MBA_LINEAR_MAX;
+		(*ptr)->mba_msr_reg = PQOS_MSR_MBA_MASK_START;
+		(*ptr)->hw_mba_get = hw_mba_get;
+		(*ptr)->hw_mba_set = hw_mba_set;
+		(*ptr)->os_mba_get = os_mba_get;
+		(*ptr)->os_mba_set = os_mba_set;
+		(*ptr)->discover_alloc_mba = discover_alloc_mba;
+		(*ptr)->pqos_get_resource_id = pqos_get_resource_id_socket;
+		(*ptr)->alloc_print_config = alloc_print_config;
+	} else if (is_amd()) {
+		(*ptr)->cpuid_cache_leaf = 0x8000001D;
+		(*ptr)->default_mba = PQOS_MBA_MAX_AMD;
+		(*ptr)->mba_msr_reg = PQOS_MSR_MBA_MASK_START_AMD;
+		(*ptr)->hw_mba_get = hw_mba_get_amd;
+		(*ptr)->hw_mba_set = hw_mba_set_amd;
+		(*ptr)->os_mba_get = os_mba_get_amd;
+		(*ptr)->os_mba_set = os_mba_set_amd;
+		(*ptr)->discover_alloc_mba = discover_alloc_mba_amd;
+		(*ptr)->pqos_get_resource_id = pqos_get_resource_id_l3_id;
+		(*ptr)->alloc_print_config = alloc_print_config_amd;
+	}
 
-        return 0;
+	return 0;
 }
 
 
