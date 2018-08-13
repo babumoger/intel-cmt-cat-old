@@ -216,7 +216,7 @@ get_unused_cos(const unsigned id,
                                 continue;
                 } else {
                         /* L2 not requested so looking at socket scope */
-                        if (m_cpu->cores[i].socket != id)
+                        if (v_def->pqos_get_resource_id(&m_cpu->cores[i]) != id)
                                 continue;
                 }
 
@@ -1086,11 +1086,11 @@ hw_alloc_assign(const unsigned technology,
                         }
                         l2id = pi->l2_id;
                 } else {
-                        if (i != 0 && socket != pi->socket) {
+                        if (i != 0 && socket != v_def->pqos_get_resource_id(pi)) {
                                 ret = PQOS_RETVAL_PARAM;
                                 goto pqos_alloc_assign_exit;
                         }
-                        socket = pi->socket;
+                        socket = v_def->pqos_get_resource_id(pi);
                 }
         }
 
