@@ -903,9 +903,14 @@ int main(int argc, char **argv)
                 /**
                  * Show info about allocation config and exit
                  */
-		alloc_print_config(cap_mon, cap_l3ca, cap_l2ca, cap_mba,
-                                   sock_count, sockets, p_cpu,
-                                   sel_verbose_mode);
+		if (v_def->alloc_print_config)
+			v_def->alloc_print_config(cap_mon, cap_l3ca, cap_l2ca,
+					          cap_mba,
+						  sock_count, sockets, p_cpu,
+						  sel_verbose_mode);
+		else
+			printf("alloc_print_config not defined!\n");
+
                 goto allocation_exit;
         }
 
