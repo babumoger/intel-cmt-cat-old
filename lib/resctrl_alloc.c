@@ -408,7 +408,7 @@ resctrl_alloc_schemata_init(const unsigned class_id,
 		/* fill class_id */
 		for (i = 0; i < num_ids; i++) {
 			schemata->mba[i].class_id = class_id;
-			schemata->mba[i].mb_rate = 100;
+			schemata->mba[i].mb_rate = PQOS_MBA_LINEAR_MAX;
 		}
 	}
 

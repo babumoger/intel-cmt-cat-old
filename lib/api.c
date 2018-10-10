@@ -745,7 +745,8 @@ pqos_mba_set(const unsigned socket,
 	 * Check if MBA rate is within allowed range
 	 */
 	for (i = 0; i < num_cos; i++)
-		if (requested[i].mb_rate == 0 || requested[i].mb_rate > 100) {
+		if (requested[i].mb_rate == 0 ||
+                    requested[i].mb_rate > PQOS_MBA_LINEAR_MAX) {
 			LOG_ERROR("MBA COS%u rate out of range (from 1-100)!\n",
 			          requested[i].class_id);
 			return PQOS_RETVAL_PARAM;
