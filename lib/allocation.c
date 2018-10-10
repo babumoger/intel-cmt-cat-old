@@ -887,8 +887,8 @@ hw_mba_set(const unsigned socket,
 
         for (i = 0; i < num_cos; i++) {
                 const uint32_t reg =
-                        requested[i].class_id + PQOS_MSR_MBA_MASK_START;
-                uint64_t val = PQOS_MBA_LINEAR_MAX -
+                        requested[i].class_id + v_def->mba_msr_reg;
+                uint64_t val = v_def->default_mba -
                         (((requested[i].mb_rate + (step/2)) / step) * step);
                 int retval = MACHINE_RETVAL_OK;
 
@@ -911,7 +911,7 @@ hw_mba_set(const unsigned socket,
                         return PQOS_RETVAL_ERROR;
 
                 actual[i] = requested[i];
-                actual[i].mb_rate = (PQOS_MBA_LINEAR_MAX - val);
+                actual[i].mb_rate = (v_def->default_mba - val);
         }
 
         return ret;
@@ -943,7 +943,7 @@ hw_mba_get(const unsigned socket,
                 return ret;
 
         for (i = 0; i < count; i++) {
-                const uint32_t reg = PQOS_MSR_MBA_MASK_START + i;
+                const uint32_t reg = v_def->mba_msr_reg + i;
                 uint64_t val = 0;
                 int retval = msr_read(core, reg, &val);
 
@@ -951,7 +951,7 @@ hw_mba_get(const unsigned socket,
                         return PQOS_RETVAL_ERROR;
 
 		mba_tab[i].class_id = i;
-                mba_tab[i].mb_rate = (unsigned) PQOS_MBA_LINEAR_MAX - val;
+                mba_tab[i].mb_rate = (unsigned) v_def->default_mba - val;
         }
         *num_cos = count;
 
@@ -1447,7 +1447,7 @@ hw_alloc_reset(const enum pqos_cdp_config l3_cdp_cfg,
                         if (ret != PQOS_RETVAL_OK)
                                 goto pqos_alloc_reset_exit;
 
-                        ret = alloc_cos_reset(PQOS_MSR_MBA_MASK_START,
+                        ret = alloc_cos_reset(v_def->mba_msr_reg,
                                               mba_cap->num_classes, core, 0);
                         if (ret != PQOS_RETVAL_OK)
                                 goto pqos_alloc_reset_exit;

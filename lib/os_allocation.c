@@ -529,7 +529,6 @@ static int
 os_alloc_reset_schematas(const struct pqos_cap_l3ca *l3_cap,
                          const struct pqos_cap_l2ca *l2_cap)
 {
-	const unsigned default_mba = PQOS_MBA_LINEAR_MAX;
 	uint64_t default_l3ca = 0;
 	uint64_t default_l2ca = 0;
 	unsigned grps;
@@ -591,7 +590,7 @@ os_alloc_reset_schematas(const struct pqos_cap_l3ca *l3_cap,
 		}
 
 		for (j = 0; j < schmt.mba_num; j++)
-			schmt.mba[j].mb_rate = default_mba;
+			schmt.mba[j].mb_rate = v_def->default_mba;
 
 		ret = resctrl_alloc_schemata_write(i, &schmt);
 
