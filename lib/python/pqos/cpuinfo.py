@@ -184,6 +184,26 @@ class PqosCpuInfo(object):
 
         return self._call_func_array(self.pqos.lib.pqos_cpu_get_sockets)
 
+    def get_l3cat_ids(self):
+        """
+        Retrieves l3cat IDs from CPU info structure.
+
+        Returns:
+            a list of l3cat IDs
+        """
+
+        return self._call_func_array(self.pqos.lib.pqos_cpu_get_l3cat_ids)
+
+    def get_mba_ids(self):
+        """
+        Retrieves mba IDs from CPU info structure.
+
+        Returns:
+            a list of mba IDs
+        """
+
+        return self._call_func_array(self.pqos.lib.pqos_cpu_get_mba_ids)
+
     def get_l2ids(self):
         """
         Retrieves L2 IDs from CPU info structure.
@@ -273,6 +293,34 @@ class PqosCpuInfo(object):
 
         return self._call_func_ref(self.pqos.lib.pqos_cpu_get_one_by_l2id,
                                    l2_id)
+
+    def get_one_by_l3cat_id(self, l3cat_id):
+        """
+        Retrieves one core ID from CPU info structure for L3CAT ID.
+
+        Parameters:
+          l3cat_id: L3CAT ID
+
+        Returns:
+            core ID
+        """
+
+        return self._call_func_ref(self.pqos.lib.pqos_cpu_get_one_by_l3cat_id,
+                                   l3cat_id)
+
+    def get_one_by_mba_id(self, mba_id):
+        """
+        Retrieves one core ID from CPU info structure for MBA ID.
+
+        Parameters:
+          mba_id: MBA ID
+
+        Returns:
+            core ID
+        """
+
+        return self._call_func_ref(self.pqos.lib.pqos_cpu_get_one_by_mba_id,
+                                   mba_id)
 
     def check_core(self, core):
         """
