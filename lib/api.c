@@ -770,7 +770,6 @@ pqos_mon_start(const unsigned num_cores,
                 return ret;
         }
 
-        memset(group, 0, sizeof(*group));
         group->intl =
             (struct pqos_mon_data_internal *)malloc(sizeof(*group->intl));
         if (group->intl == NULL) {

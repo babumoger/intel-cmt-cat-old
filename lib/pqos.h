@@ -458,6 +458,8 @@ struct pqos_mon_data {
          */
         int valid;                       /**< structure validity marker */
         enum pqos_mon_event event;       /**< monitored event */
+        unsigned mbm_total_config;       /**< bandwidth total config */
+        unsigned mbm_local_config;       /**< bandwidth local config */
         void *context;                   /**< application specific context
                                             pointer */
         struct pqos_event_values values; /**< RMID events value */
