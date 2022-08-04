@@ -694,8 +694,10 @@ grp_add(enum mon_group_type type,
  */
 
 static void
-parse_event(const char *str, enum pqos_mon_event *evt)
+parse_event(const char *str, enum pqos_mon_event *evt, unsigned *evt_config)
 {
+        char *cp = NULL, *p = NULL, *token = NULL;
+
         ASSERT(str != NULL);
         ASSERT(evt != NULL);
         /**
@@ -706,9 +708,11 @@ parse_event(const char *str, enum pqos_mon_event *evt)
                 *evt = PQOS_MON_EVENT_L3_OCCUP;
         else if (strncasecmp(str, "mbr:", 4) == 0)
                 *evt = PQOS_MON_EVENT_RMEM_BW;
-        else if (strncasecmp(str, "mbl:", 4) == 0)
+        else if ((strncasecmp(str, "mbl:", 4) == 0) ||
+                 (strncasecmp(str, "mbl@", 4) == 0))
                 *evt = PQOS_MON_EVENT_LMEM_BW;
-        else if (strncasecmp(str, "mbt:", 4) == 0)
+        else if ((strncasecmp(str, "mbt:", 4) == 0) ||
+                 (strncasecmp(str, "mbt@", 4) == 0))
                 *evt = PQOS_MON_EVENT_TMEM_BW;
         else if (strncasecmp(str, "all:", 4) == 0 ||
                  strncasecmp(str, ":", 1) == 0)
@@ -717,6 +721,14 @@ parse_event(const char *str, enum pqos_mon_event *evt)
                 *evt = PQOS_PERF_EVENT_LLC_REF;
         else
                 parse_error(str, "Unrecognized monitoring event type");
+
+        selfn_strdup(&cp, str);
+        p = strchr(cp, '@');
+        if (p != NULL) {
+                token = strtok(p + 1, ":");
+                *evt_config = strtouint64(token);
+        }
+        free(cp);
 }
 
 #define PARSE_MON_GRP_BUFF_SIZE 1250
@@ -738,8 +750,9 @@ parse_monitor_group(char *str, enum mon_group_type type)
         unsigned i;
         uint64_t cbuf[PARSE_MON_GRP_BUFF_SIZE];
         char *non_grp = NULL;
+        unsigned evt_config = 0xFF; /* Not valid */
 
-        parse_event(str, &evt);
+        parse_event(str, &evt, &evt_config);
 
         str = strchr(str, ':') + 1;
 
