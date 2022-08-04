@@ -1186,3 +1186,26 @@ pqos_mon_get_ipc(const struct pqos_mon_data *const group, double *value)
 
         return ret;
 }
+
+unsigned
+pqos_mon_evt_default_val(const enum pqos_mon_event event_id)
+{
+        const struct cpuinfo_config *vconfig;
+        unsigned val;
+
+        cpuinfo_get_config(&vconfig);
+
+        switch (event_id) {
+        case PQOS_MON_EVENT_TMEM_BW:
+                val = vconfig->mbm_total_config;
+                break;
+        case PQOS_MON_EVENT_LMEM_BW:
+                val = vconfig->mbm_local_config;
+                break;
+        default:
+                val = 0xFF; /* Undefined */
+                break;
+        }
+
+        return val;
+}
