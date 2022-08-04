@@ -181,6 +181,17 @@ PQOS_LOCAL int resctrl_mon_assoc_set_pid(const pid_t task, const char *name);
  */
 PQOS_LOCAL int resctrl_mon_active(unsigned *monitoring_status);
 
+/**
+ * @brief Check if resctrl monitoring is active
+ *
+ * @param [in] group pointer to pqos_mon_data structure
+ * @param [in] max_cos Max COS numbers supported
+ *
+ * @return Operational status
+ * @retval PQOS_RETVAL_OK on success
+ */
+int resctrl_mon_event_configure(struct pqos_mon_data *group, unsigned max_cos);
+
 #ifdef __cplusplus
 }
 #endif
