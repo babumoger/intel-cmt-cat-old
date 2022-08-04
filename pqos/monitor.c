@@ -125,6 +125,8 @@ static struct mon_group {
         enum mon_group_type type;
         char *desc;
         enum pqos_mon_event events;
+        unsigned mbm_total_config;
+        unsigned mbm_local_config;
         struct pqos_mon_data *data;
         unsigned started;
 
@@ -568,6 +570,41 @@ grp_free(struct mon_group *grp)
 }
 
 /**
+ * @brief Function to set event config values
+ *
+ * @param [in] pg pointer to pid_group structure
+ * @param [in] event monitoring event id
+ * @param [in] event configuration setting
+ *
+ * @return Operational status
+ * @retval 0 on success
+ * @retval PQOS_RETVAL_ERROR on error
+ */
+static int
+grp_set_event_config(struct mon_group *pg,
+                     enum pqos_mon_event event,
+                     unsigned event_config)
+{
+        int ret = PQOS_RETVAL_OK;
+
+        ASSERT(pg != NULL);
+
+        switch (event) {
+        case PQOS_MON_EVENT_TMEM_BW:
+                pg->mbm_total_config = event_config;
+                break;
+        case PQOS_MON_EVENT_LMEM_BW:
+                pg->mbm_local_config = event_config;
+                break;
+        default:
+                ret = PQOS_RETVAL_ERROR;
+                break;
+        }
+
+        return ret;
+}
+
+/**
  * @brief Adds monitoring group
  *
  * @param type monitoring group type
@@ -583,6 +620,7 @@ grp_free(struct mon_group *grp)
 static int
 grp_add(enum mon_group_type type,
         enum pqos_mon_event event,
+        unsigned event_config,
         char *desc,
         const uint64_t *res,
         const int num_res)
@@ -613,6 +651,16 @@ grp_add(enum mon_group_type type,
                 return ret;
         }
         new_grp.events = event;
+
+        /**
+         * Update monitoring event config values in mon_group
+         */
+        if (event_config != 0xFF) {
+                ret = grp_set_event_config(&new_grp, event, event_config);
+                if (ret != PQOS_RETVAL_OK)
+                        printf("Error setting the  event %d configuration\n",
+                               event);
+        }
 
         /**
          *  For each core group we are processing:
@@ -773,7 +821,8 @@ parse_monitor_group(char *str, enum mon_group_type type)
                                 char *desc = uinttostr((unsigned)cbuf[i]);
                                 int ret;
 
-                                ret = grp_add(type, evt, desc, &cbuf[i], 1);
+                                ret = grp_add(type, evt, evt_config, desc,
+                                              &cbuf[i], 1);
                                 if (ret < 0)
                                         return -1;
                                 group_count++;
@@ -798,7 +847,8 @@ parse_monitor_group(char *str, enum mon_group_type type)
                         element_count = strlisttotab(grp, cbuf, DIM(cbuf));
 
                         /* set group info */
-                        ret = grp_add(type, evt, desc, cbuf, element_count);
+                        ret = grp_add(type, evt, evt_config, desc, cbuf,
+                                      element_count);
                         if (ret < 0)
                                 return -1;
                         group_count++;
@@ -1019,7 +1069,7 @@ monitor_setup(const struct pqos_cpuinfo *cpu_info,
 
                         ret = grp_add(MON_GROUP_TYPE_CORE,
                                       (enum pqos_mon_event)PQOS_MON_EVENT_ALL,
-                                      uinttostr(lcore), &core, 1);
+                                      0, uinttostr(lcore), &core, 1);
                         if (ret != 0) {
                                 printf("Core group setup error!\n");
                                 exit(EXIT_FAILURE);
@@ -1032,7 +1082,7 @@ monitor_setup(const struct pqos_cpuinfo *cpu_info,
 
                         ret = grp_add(MON_GROUP_TYPE_UNCORE,
                                       (enum pqos_mon_event)PQOS_MON_EVENT_ALL,
-                                      uinttostr(socket), &socket, 1);
+                                      0, uinttostr(socket), &socket, 1);
                         if (ret != 0) {
                                 printf("Uncore group setup error!\n");
                                 exit(EXIT_FAILURE);
@@ -1738,7 +1788,7 @@ fill_top_procs(const struct slist *pslist)
                  * order
                  */
                 int retval = grp_add(MON_GROUP_TYPE_PID,
-                                     (enum pqos_mon_event)PQOS_MON_EVENT_ALL,
+                                     (enum pqos_mon_event)PQOS_MON_EVENT_ALL, 0,
                                      desc, &pid, 1);
                 if (retval < 0)
                         exit(EXIT_FAILURE);
