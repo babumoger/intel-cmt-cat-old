@@ -1464,7 +1464,7 @@ main(int argc, char **argv)
                 goto error_exit_2;
         }
         monitor_loop();
-        monitor_stop();
+        monitor_stop(cap_mon);
 
 allocation_exit:
 error_exit_2:
