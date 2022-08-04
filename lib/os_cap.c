@@ -402,7 +402,7 @@ os_cap_mon_discover(struct pqos_cap_mon **r_cap, const struct pqos_cpuinfo *cpu)
         struct pqos_cap_mon *cap = NULL;
         int supported;
         int ret = PQOS_RETVAL_OK;
-        uint64_t num_rmids = 0;
+        uint64_t num_rmids = 0, mon_configurable = 0;
         unsigned i;
 
         enum pqos_mon_event events[] = {
@@ -433,6 +433,14 @@ os_cap_mon_discover(struct pqos_cap_mon **r_cap, const struct pqos_cpuinfo *cpu)
                         return ret;
         }
 
+        if (pqos_file_exists(RESCTRL_PATH_INFO_L3_MON "/mon_configurable")) {
+                ret = pqos_fread_uint64(RESCTRL_PATH_INFO_L3_MON
+                                        "/mon_configurable",
+                                        10, &mon_configurable);
+                if (ret != PQOS_RETVAL_OK)
+                        return ret;
+        }
+
         cap = (struct pqos_cap_mon *)malloc(sizeof(*cap));
         if (cap == NULL)
                 return PQOS_RETVAL_RESOURCE;
@@ -440,6 +448,7 @@ os_cap_mon_discover(struct pqos_cap_mon **r_cap, const struct pqos_cpuinfo *cpu)
         cap->mem_size = sizeof(*cap);
         cap->max_rmid = num_rmids;
         cap->l3_size = cpu->l3.total_size;
+        cap->mon_configurable = mon_configurable;
 
         for (i = 0; i < DIM(events); i++) {
                 int supported;
