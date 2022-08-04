@@ -74,6 +74,11 @@ static enum pqos_cdp_config selfn_l2cdp_config = PQOS_REQUIRE_CDP_ANY;
 static enum pqos_mba_config selfn_mba_config = PQOS_MBA_ANY;
 
 /**
+ * Default SMBA configuration option - don't enforce on or off
+ */
+static enum pqos_mba_config selfn_smba_config = PQOS_MBA_ANY;
+
+/**
  * Monitoring reset
  */
 static int sel_mon_reset = 0;
@@ -1394,7 +1399,7 @@ main(int argc, char **argv)
                  * Reset allocation configuration to after-reset state and exit
                  */
                 ret = pqos_alloc_reset(selfn_l3cdp_config, selfn_l2cdp_config,
-                                       selfn_mba_config);
+                                       selfn_mba_config, selfn_smba_config);
                 if (ret != PQOS_RETVAL_OK) {
                         exit_val = EXIT_FAILURE;
                         printf("Allocation reset failed!\n");
