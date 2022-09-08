@@ -1460,6 +1460,19 @@ int pqos_mon_get_value(const struct pqos_mon_data *const group,
  */
 int pqos_mon_get_ipc(const struct pqos_mon_data *const group, double *value);
 
+/*
+ * @brief Retrieves the default value if mon_configurale is supported
+ *
+ * @param [in] event_config configuration value user wants to set
+ * @param [in] event_id event type
+ *
+ * @param [out] valid event configuration value
+ *
+ * @return Operation status
+ * @retval valid event configuration value or 0xFF on failure
+ */
+unsigned pqos_mon_evt_default_val(const enum pqos_mon_event event_id);
+
 #ifdef __cplusplus
 }
 #endif
