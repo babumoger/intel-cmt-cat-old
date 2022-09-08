@@ -1737,3 +1737,157 @@ resctrl_mon_active(unsigned *monitoring_status)
         *monitoring_status = 0;
         return PQOS_RETVAL_OK;
 }
+
+/**
+ * @brief Read counter value
+ *
+ * @param [in] class_id COS id
+ * @param [in] resctrl_group mon group name
+ * @param [in] l3id l3id to read from
+ * @param [in] event resctrl mon event
+ * @param [out] value counter value
+ *
+ * @return Operational status
+ * @retval PQOS_RETVAL_OK on success
+ */
+static int
+resctrl_mon_event_config_set(const unsigned class_id,
+                             const char *resctrl_group,
+                             const unsigned l3id,
+                             const enum pqos_mon_event event,
+                             unsigned value)
+{
+        char buf[128];
+        const char *name;
+        char path[PATH_MAX];
+        FILE *fd;
+
+        ASSERT(resctrl_group != NULL);
+
+        switch (event) {
+        case PQOS_MON_EVENT_LMEM_BW:
+                name = "mbm_local_config";
+                break;
+        case PQOS_MON_EVENT_TMEM_BW:
+                name = "mbm_total_config";
+                break;
+        default:
+                LOG_ERROR("Unknown resctrl event\n");
+                return PQOS_RETVAL_PARAM;
+                break;
+        }
+
+        resctrl_mon_group_path(class_id, resctrl_group, NULL, buf, sizeof(buf));
+        snprintf(path, sizeof(path), "%s/mon_data/mon_L3_%02u/%s", buf, l3id,
+                 name);
+        fd = pqos_fopen(path, "w");
+        if (fd == NULL)
+                return PQOS_RETVAL_ERROR;
+
+        fprintf(fd, "%d\n", value);
+        fclose(fd);
+
+        return PQOS_RETVAL_OK;
+}
+
+/**
++ * @brief Read counter value from requested \a l3ids
++ *
++ * @param [in] class_id COS id
++ * @param [in] resctrl_group mon group name
++ * @param [in] event resctrl mon event
++ * @param [in] l3ids l3ids to read from
++ * @param [in] l3ids_num number of l3ids
++ * @param [in] event monitoring event
++ * @param [out] value counter value
++ *
++ * @return Operational status
++ * @retval PQOS_RETVAL_OK on success
++ */
+static int
+resctrl_mon_event_config_update(const unsigned class_id,
+                                const char *resctrl_group,
+                                unsigned *l3ids,
+                                unsigned l3ids_num,
+                                const enum pqos_mon_event event,
+                                unsigned value)
+{
+        int ret = PQOS_RETVAL_OK;
+        unsigned *l3cat_ids = NULL;
+        unsigned l3cat_id_num;
+        unsigned l3cat_id;
+
+        ASSERT(resctrl_group != NULL);
+
+        if (l3ids == NULL) {
+                l3cat_ids = pqos_cpu_get_l3cat_ids(m_cpu, &l3cat_id_num);
+                if (l3cat_ids == NULL) {
+                        ret = PQOS_RETVAL_ERROR;
+                        goto resctrl_mon_read_exit;
+                }
+        } else {
+                l3cat_ids = l3ids;
+                l3cat_id_num = l3ids_num;
+        }
+
+        for (l3cat_id = 0; l3cat_id < l3cat_id_num; l3cat_id++) {
+                const unsigned l3id = l3cat_ids[l3cat_id];
+
+                ret = resctrl_mon_event_config_set(class_id, resctrl_group,
+                                                   l3id, event, value);
+                if (ret != PQOS_RETVAL_OK)
+                        goto resctrl_mon_read_exit;
+        }
+
+resctrl_mon_read_exit:
+        if (l3ids == NULL && l3cat_ids != NULL)
+                free(l3cat_ids);
+
+        return ret;
+}
+
+/**
+ * @brief Assigns resctrl monitoring group
+ *
+ * @param group monitoring structure
+ *
+ * @return Resctrl monitoring group
+ */
+int
+resctrl_mon_event_configure(struct pqos_mon_data *group, unsigned max_cos)
+{
+        int ret = PQOS_RETVAL_OK;
+        unsigned cos = 0;
+        struct stat st;
+        char buf[128];
+        const char *resctrl_group = group->intl->resctrl.mon_group;
+        unsigned *l3ids = group->intl->resctrl.l3id;
+        unsigned num_l3id = group->intl->resctrl.num_l3id;
+
+        do {
+                resctrl_mon_group_path(cos, group->intl->resctrl.mon_group,
+                                       NULL, buf, sizeof(buf));
+                if (stat(buf, &st) != 0)
+                        continue;
+
+                if (group->event & PQOS_MON_EVENT_TMEM_BW) {
+                        ret = resctrl_mon_event_config_update(
+                            cos, resctrl_group, l3ids, num_l3id,
+                            PQOS_MON_EVENT_TMEM_BW, group->mbm_total_config);
+                        if (ret != PQOS_RETVAL_OK)
+                                goto resctrl_update_mon_configuration_exit;
+                }
+
+                if (group->event & PQOS_MON_EVENT_LMEM_BW) {
+                        ret = resctrl_mon_event_config_update(
+                            cos, resctrl_group, l3ids, num_l3id,
+                            PQOS_MON_EVENT_LMEM_BW, group->mbm_local_config);
+                        if (ret != PQOS_RETVAL_OK)
+                                goto resctrl_update_mon_configuration_exit;
+                }
+
+        } while (++cos < max_cos);
+
+resctrl_update_mon_configuration_exit:
+        return ret;
+}
