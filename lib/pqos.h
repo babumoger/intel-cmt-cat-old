@@ -770,7 +770,8 @@ int pqos_alloc_release_pid(const pid_t *task_array, const unsigned task_num);
  */
 int pqos_alloc_reset(const enum pqos_cdp_config l3_cdp_cfg,
                      const enum pqos_cdp_config l2_cdp_cfg,
-                     const enum pqos_mba_config mba_cfg);
+                     const enum pqos_mba_config mba_cfg,
+                     const enum pqos_mba_config smba_cfg);
 
 /*
  * =======================================
