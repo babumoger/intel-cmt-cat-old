@@ -260,6 +260,36 @@ PQOS_LOCAL int hw_mon_read_counter(struct pqos_mon_data *group,
 PQOS_LOCAL int hw_mon_poll(struct pqos_mon_data *group,
                            const enum pqos_mon_event event);
 
+/**
+ * @brief Writes \a lcore to RMID association
+ *
+ * This function doesn't acquire API lock
+ * and can be used internally when lock is already taken.
+ *
+ * @param lcore logical core id
+ * @param rmid resource monitoring ID
+ *
+ * @return Operation status
+ * @retval PQOS_RETVAL_OK on success
+ */
+PQOS_LOCAL int hw_mon_event_configure(struct pqos_mon_data *group);
+
+/**
+ * @brief Writes \a lcore to RMID association
+ *
+ * This function doesn't acquire API lock
+ * and can be used internally when lock is already taken.
+ *
+ * @param lcore logical core id
+ * @param rmid resource monitoring ID
+ *
+ * @return Operation status
+ * @retval PQOS_RETVAL_OK on success
+ */
+PQOS_LOCAL int hw_mon_event_config_write(const unsigned lcore,
+                                         const enum pqos_mon_event event,
+                                         unsigned event_config);
+
 #ifdef __cplusplus
 }
 #endif

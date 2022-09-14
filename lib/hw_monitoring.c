@@ -971,6 +971,78 @@ validate_event(const struct pqos_cap *cap, const enum pqos_mon_event event)
 }
 
 int
+hw_mon_event_config_write(const unsigned lcore,
+                          const enum pqos_mon_event event,
+                          unsigned event_config)
+{
+        int ret = 0;
+        uint32_t reg = 0;
+
+        event_config &= PQOS_MSR_EVT_CFG_MASK;
+
+        if (event & PQOS_MON_EVENT_TMEM_BW)
+                reg = PQOS_MSR_EVT_CFG_BASE;
+        else if (event & PQOS_MON_EVENT_LMEM_BW)
+                reg = PQOS_MSR_EVT_CFG_BASE + 1;
+        else
+                return PQOS_RETVAL_PARAM;
+
+        ret = msr_write(lcore, reg, event_config);
+        if (ret != MACHINE_RETVAL_OK)
+                return PQOS_RETVAL_ERROR;
+
+        return PQOS_RETVAL_OK;
+}
+
+int
+hw_mon_event_configure(struct pqos_mon_data *group)
+{
+        unsigned i;
+        int ret = PQOS_RETVAL_OK;
+        const struct pqos_cap *cap = _pqos_get_cap();
+        const struct pqos_cpuinfo *cpu = _pqos_get_cpu();
+
+        ASSERT(group != NULL);
+
+        ret = validate_event(cap, group->event);
+        if (ret != PQOS_RETVAL_OK)
+                return ret;
+
+        /**
+         * Check if all requested cores are valid
+         * and not used by other monitoring processes.
+         *
+         * Check if any of requested cores is already subject to monitoring
+         * within this process.
+         */
+        for (i = 0; i < group->num_cores; i++) {
+                const unsigned lcore = group->cores[i];
+
+                ret = pqos_cpu_check_core(cpu, lcore);
+                if (ret != PQOS_RETVAL_OK)
+                        return PQOS_RETVAL_PARAM;
+
+                if (group->event & PQOS_MON_EVENT_TMEM_BW) {
+                        ret = hw_mon_event_config_write(
+                            lcore, PQOS_MON_EVENT_TMEM_BW,
+                            group->mbm_total_config);
+                        if (ret != PQOS_RETVAL_OK)
+                                return PQOS_RETVAL_PARAM;
+                }
+
+                if (group->event & PQOS_MON_EVENT_LMEM_BW) {
+                        ret = hw_mon_event_config_write(
+                            lcore, PQOS_MON_EVENT_LMEM_BW,
+                            group->mbm_local_config);
+                        if (ret != PQOS_RETVAL_OK)
+                                return PQOS_RETVAL_PARAM;
+                }
+        }
+
+        return ret;
+}
+
+int
 hw_mon_start(const unsigned num_cores,
              const unsigned *cores,
              const enum pqos_mon_event event,
