@@ -60,9 +60,8 @@
 #include <time.h>      /**< localtime() */
 #include <unistd.h>
 
-#define PQOS_MON_EVENT_ALL                                                     \
-        ((enum pqos_mon_event) ~(PQOS_MON_EVENT_TMEM_BW |                      \
-                                 PQOS_PERF_EVENT_LLC_REF))
+#define PQOS_MON_EVENT_ALL ((enum pqos_mon_event) ~(PQOS_PERF_EVENT_LLC_REF))
+
 #define PQOS_MON_EVENT_UNCORE                                                  \
         ((enum pqos_mon_event)(PQOS_PERF_EVENT_LLC_MISS_PCIE_READ |            \
                                PQOS_PERF_EVENT_LLC_MISS_PCIE_WRITE |           \
