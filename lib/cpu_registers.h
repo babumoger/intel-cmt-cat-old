@@ -74,6 +74,12 @@ extern "C" {
  */
 #define PQOS_MSR_SMBA_MASK_START_AMD 0xC0000280
 
+/**
+ * Event configuration values
+ */
+#define PQOS_MBM_TOTAL_CONFIG_AMD 0x7F
+#define PQOS_MBM_LOCAL_CONFIG_AMD 0x15
+
 #define PQOS_MSR_L3_QOS_CFG        0xC81 /**< L3 CAT config register */
 #define PQOS_MSR_L3_QOS_CFG_CDP_EN 1ULL  /**< L3 CDP enable bit */
 
