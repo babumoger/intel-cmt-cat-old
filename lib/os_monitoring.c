@@ -38,6 +38,7 @@
 #include "monitoring.h"
 #include "perf_monitoring.h"
 #include "resctrl.h"
+#include "resctrl_alloc.h"
 #include "resctrl_monitoring.h"
 
 #include <dirent.h> /**< scandir() */
@@ -399,6 +400,21 @@ os_mon_stop(struct pqos_mon_data *group)
                 group->tid_map = NULL;
         }
 
+        return ret;
+}
+
+int
+os_mon_event_configure(struct pqos_mon_data *group)
+{
+        const struct pqos_cap *cap = _pqos_get_cap();
+        int ret = PQOS_RETVAL_OK;
+        unsigned max_cos;
+
+        ret = resctrl_alloc_get_grps_num(cap, &max_cos);
+        if (ret != PQOS_RETVAL_OK)
+                return ret;
+
+        ret = resctrl_mon_event_configure(group, max_cos);
         return ret;
 }
 
