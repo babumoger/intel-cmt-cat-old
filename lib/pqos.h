@@ -315,6 +315,7 @@ struct pqos_cap_mon {
         unsigned max_rmid;   /**< max RMID supported by socket */
         unsigned l3_size;    /**< L3 cache size in bytes */
         unsigned num_events; /**< number of supported events */
+        unsigned mon_configurable; /**< Monitor events are configurable */
         struct pqos_monitor events[0];
 };
 
