@@ -636,6 +636,31 @@ monitor_setup_event_config(struct mon_group *pg, struct pqos_mon_data *data)
 }
 
 /**
+ * @brief Function to reset event config values
+ *
+ * @param pg pointer to pid_group structure
+ * @param desc string containing pid group description
+ * @param pids pointer to table of pid values
+ * @param num_pids number of pids contained in the table
+ *
+ * @return Operational status
+ * @retval 0 on success
+ * @retval -1 on error
+ */
+static void
+monitor_event_config_reset(struct pqos_mon_data *data)
+{
+        ASSERT(pg != NULL);
+        ASSERT(data != NULL);
+
+        /* Set it to default values */
+        data->mbm_total_config =
+            pqos_mon_evt_default_val(PQOS_MON_EVENT_TMEM_BW);
+        data->mbm_local_config =
+            pqos_mon_evt_default_val(PQOS_MON_EVENT_LMEM_BW);
+}
+
+/**
  * @brief Adds monitoring group
  *
  * @param type monitoring group type
@@ -1223,14 +1248,24 @@ monitor_setup(const struct pqos_cpuinfo *cpu_info,
 }
 
 void
-monitor_stop(void)
+monitor_stop(const struct pqos_capability *const cap_mon)
 {
         unsigned i;
+        int ret;
 
         for (i = 0; i < sel_monitor_num; i++) {
                 struct mon_group *grp = &sel_monitor_group[i];
 
-                int ret = pqos_mon_stop(grp->data);
+                if (cap_mon->u.mon->mon_configurable) {
+                        /* Reset to default values */
+                        monitor_event_config_reset(grp->data);
+                        ret = pqos_mon_event_configure(grp->data);
+                        if (ret != PQOS_RETVAL_OK)
+                                printf("Monitoring event configuration reset "
+                                       "error!\n");
+                }
+
+                ret = pqos_mon_stop(grp->data);
 
                 if (ret != PQOS_RETVAL_OK)
                         printf("Monitoring stop error!\n");
