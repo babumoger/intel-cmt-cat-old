@@ -56,6 +56,10 @@ struct cpuinfo_config {
         unsigned mba_default_val; /**< Memory bandwidth reset value */
         uint32_t mba_msr_reg;     /**< MBA mask base register */
         uint32_t smba_msr_reg;    /**< SMBA mask base register */
+        unsigned
+            mbm_total_bytes_config; /**< MBM total event config default value */
+        unsigned
+            mbm_local_bytes_config; /**< MBM local event config default value */
 };
 
 /**
