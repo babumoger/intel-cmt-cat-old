@@ -145,7 +145,7 @@ main(int argc, char *argv[])
         }
         /* Reset Api */
         ret = pqos_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                               PQOS_MBA_ANY);
+                               PQOS_MBA_ANY, PQOS_MBA_ANY);
         if (ret != PQOS_RETVAL_OK)
                 printf("CAT reset failed!\n");
         else
