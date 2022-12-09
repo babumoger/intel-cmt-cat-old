@@ -38,6 +38,7 @@
 #include "monitoring.h"
 #include "perf_monitoring.h"
 #include "resctrl.h"
+#include "resctrl_alloc.h"
 #include "resctrl_monitoring.h"
 
 #include <dirent.h> /**< scandir() */
@@ -394,6 +395,15 @@ os_mon_stop(struct pqos_mon_data *group)
                 group->tid_map = NULL;
         }
 
+        return ret;
+}
+
+int
+os_mon_event_configure(struct pqos_mon_data *group)
+{
+        int ret;
+
+        ret = resctrl_event_configure(group);
         return ret;
 }
 
