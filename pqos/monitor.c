@@ -606,6 +606,37 @@ grp_set_event_config(struct mon_group *pg,
 }
 
 /**
+ * @brief Function to set event config values
+ *
+ * @param pg pointer to pid_group structure
+ * @param data pointer to pqos_mon_data structure
+ *
+ * @return Operational status
+ * @retval 0 on success
+ * @retval -1 on error
+ */
+static void
+monitor_setup_event_config(struct mon_group *pg, struct pqos_mon_data *data)
+{
+        ASSERT(pg != NULL);
+        ASSERT(data != NULL);
+
+        /* Set the event configuration to default if not defined */
+
+        if (pg->mbm_total_bytes_config == PQOS_MBM_INVALID_CONFIG)
+                data->mbm_total_bytes_config =
+                    pqos_mon_evt_default_val(PQOS_MON_EVENT_TMEM_BW);
+        else
+                data->mbm_total_bytes_config = pg->mbm_total_bytes_config;
+
+        if (pg->mbm_local_bytes_config == PQOS_MBM_INVALID_CONFIG)
+                data->mbm_local_bytes_config =
+                    pqos_mon_evt_default_val(PQOS_MON_EVENT_LMEM_BW);
+        else
+                data->mbm_local_bytes_config = pg->mbm_local_bytes_config;
+}
+
+/**
  * @brief Adds monitoring group
  *
  * @param type monitoring group type
@@ -1097,6 +1128,12 @@ monitor_setup(const struct pqos_cpuinfo *cpu_info,
                 struct mon_group *grp = &sel_monitor_group[i];
 
                 monitor_setup_events(grp->type, &grp->events, cap_mon);
+
+                /**
+                 * Update event_config if it was passed
+                 */
+                if (cap_mon->u.mon->mon_configurable)
+                        monitor_setup_event_config(grp, grp->data);
 
                 if (grp->type == MON_GROUP_TYPE_CORE) {
                         /**
