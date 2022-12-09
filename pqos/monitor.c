@@ -1155,8 +1155,17 @@ monitor_setup(const struct pqos_cpuinfo *cpu_info,
                                        "%s, status %d\n",
                                        grp->desc, ret);
                                 break;
-                        } else
+                        } else {
+                                if (cap_mon->u.mon->mon_configurable) {
+                                        ret =
+                                            pqos_mon_event_configure(grp->data);
+                                        if (ret != PQOS_RETVAL_OK)
+                                                printf("Monitoring event "
+                                                       "configuration "
+                                                       "failed!\n");
+                                }
                                 grp->started = 1;
+                        }
 
                 } else if (grp->type == MON_GROUP_TYPE_PID) {
                         /**
@@ -1173,8 +1182,17 @@ monitor_setup(const struct pqos_cpuinfo *cpu_info,
                                        "status %d\n",
                                        grp->desc, ret);
                                 break;
-                        } else
+                        } else {
+                                if (cap_mon->u.mon->mon_configurable) {
+                                        ret =
+                                            pqos_mon_event_configure(grp->data);
+                                        if (ret != PQOS_RETVAL_OK)
+                                                printf("Monitoring event "
+                                                       "configuration "
+                                                       "failed!\n");
+                                }
                                 grp->started = 1;
+                        }
 
                 } else if (grp->type == MON_GROUP_TYPE_UNCORE) {
                         ret = pqos_mon_start_uncore(

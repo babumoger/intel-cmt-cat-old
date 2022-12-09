@@ -90,6 +90,9 @@ static struct pqos_api {
         /** Stops resource monitoring data for selected monitoring group */
         int (*mon_stop)(struct pqos_mon_data *group);
 
+        /** Configure monitor events if supported */
+        int (*mon_event_configure)(struct pqos_mon_data *group);
+
         /** Associates lcore with given class of service */
         int (*alloc_assoc_set)(const unsigned lcore, const unsigned class_id);
         /** Reads association of lcore with class of service */
@@ -515,6 +518,15 @@ pqos_l3ca_get_min_cbm_bits(unsigned *min_cbm_bits)
                 return PQOS_RETVAL_PARAM;
 
         return API_CALL(l3ca_get_min_cbm_bits, min_cbm_bits);
+}
+
+int
+pqos_mon_event_configure(struct pqos_mon_data *group)
+{
+        if (group == NULL)
+                return PQOS_RETVAL_PARAM;
+
+        return API_CALL(mon_event_configure, group);
 }
 
 /*

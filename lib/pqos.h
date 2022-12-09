@@ -1023,6 +1023,16 @@ unsigned *pqos_cpu_get_mba_ids(const struct pqos_cpuinfo *cpu, unsigned *count);
  */
 unsigned *pqos_cpu_get_smba_ids(const struct pqos_cpuinfo *cpu,
                                 unsigned *count);
+/**
+ * @brief Configures the event settings if supported
+ *
+ * @param [in] pqos_mon_data information structure
+ *
+ * @return Operational status
+ * @retval PQOS_RETVAL_OK on success
+ * @retval PQOS_RETVAL_RESOURCE if unable to determine
+ */
+int pqos_mon_event_configure(struct pqos_mon_data *group);
 
 /**
  * @brief Retrieves l3cat id's from cpu info structure
