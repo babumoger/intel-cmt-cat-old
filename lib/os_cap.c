@@ -396,6 +396,38 @@ detect_mon_support(const enum pqos_mon_event event,
         return ret;
 }
 
+static int
+os_mon_configurable(uint32_t *configurable)
+{
+        int ret = PQOS_RETVAL_OK;
+        char buf[64];
+        FILE *fd;
+
+        /**
+         * Discover monitor configuration features
+         */
+        fd = pqos_fopen(RESCTRL_PATH_INFO_L3_MON "/mon_features", "r");
+        if (fd == NULL) {
+                LOG_ERROR("Failed to obtain resctrl monitoring features\n");
+                return PQOS_RETVAL_ERROR;
+        }
+
+        while (fgets(buf, sizeof(buf), fd) != NULL) {
+                if ((strncmp(buf, "mbm_total_bytes_config\n", sizeof(buf)) ==
+                     0) ||
+                    (strncmp(buf, "mbm_local_bytes_config\n", sizeof(buf)) ==
+                     0)) {
+                        LOG_INFO("Detected resctrl monitor configuration\n");
+                        *configurable = 1;
+                        break;
+                }
+        }
+
+        fclose(fd);
+
+        return ret;
+}
+
 int
 os_cap_mon_discover(struct pqos_cap_mon **r_cap, const struct pqos_cpuinfo *cpu)
 {
@@ -403,6 +435,7 @@ os_cap_mon_discover(struct pqos_cap_mon **r_cap, const struct pqos_cpuinfo *cpu)
         int supported;
         int ret = PQOS_RETVAL_OK;
         uint64_t num_rmids = 0;
+        uint32_t mon_configurable = 0;
         unsigned i;
 
         enum pqos_mon_event events[] = {
@@ -433,6 +466,12 @@ os_cap_mon_discover(struct pqos_cap_mon **r_cap, const struct pqos_cpuinfo *cpu)
                         return ret;
         }
 
+        if (pqos_file_exists(RESCTRL_PATH_INFO_L3_MON "/mon_features")) {
+                ret = os_mon_configurable(&mon_configurable);
+                if (ret != PQOS_RETVAL_OK)
+                        return ret;
+        }
+
         cap = (struct pqos_cap_mon *)malloc(sizeof(*cap));
         if (cap == NULL)
                 return PQOS_RETVAL_RESOURCE;
@@ -440,6 +479,7 @@ os_cap_mon_discover(struct pqos_cap_mon **r_cap, const struct pqos_cpuinfo *cpu)
         cap->mem_size = sizeof(*cap);
         cap->max_rmid = num_rmids;
         cap->l3_size = cpu->l3.total_size;
+        cap->mon_configurable = mon_configurable;
 
         for (i = 0; i < DIM(events); i++) {
                 uint32_t scale;
