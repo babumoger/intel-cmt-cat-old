@@ -80,6 +80,11 @@ extern "C" {
 #define PQOS_MBM_TOTAL_CONFIG_AMD 0x7F
 #define PQOS_MBM_LOCAL_CONFIG_AMD 0x15
 #define PQOS_MBM_INVALID_CONFIG   0xFF
+/**
+ * AMD event configuration registers
+ */
+#define PQOS_MSR_EVT_CFG_BASE 0xc0000400
+#define PQOS_MSR_EVT_CFG_MASK 0x7F
 
 #define PQOS_MSR_L3_QOS_CFG        0xC81 /**< L3 CAT config register */
 #define PQOS_MSR_L3_QOS_CFG_CDP_EN 1ULL  /**< L3 CDP enable bit */
