@@ -194,6 +194,42 @@ Example "-m all:0,2,4-10;llc:1,3;mbr:11-12".
 Core statistics can be grouped by enclosing the core list in square brackets.
 .br
 Example "-m llc:[0-3];all:[4,5,6];mbr:[0-3],7,8".
+.PP
+.RS
+If the system supports event configuration, then the event settings can be passed with format "EVENT@CONFIG:CORE_LIST".
+.br
+The event mbt(local memory bandwidth) and mbt (total memory bandwidth) are configurable.
+.br
+Example "-m mbt@0x7f:0,2,4-10;mbl@0x15:1,3".
+.br
+This configures the mbt to 0x7f and mbl to 0x15 on the specific cores passed.
+.br
+The value 0x7f sets all the event bits and 0x15 sets only local events. Only those events will be counted.
+.br
+Following is the bitmap of the events supported:
+.br
+====    ========================================================
+.br
+Bits    Description
+.br
+====    ========================================================
+.br
+6       Dirty Victims from the QOS domain to all types of memory
+.br
+5       Reads to slow memory in the non-local NUMA domain
+.br
+4       Reads to slow memory in the local NUMA domain
+.br
+3       Non-temporal writes to non-local NUMA domain
+.br
+2       Non-temporal writes to local NUMA domain
+.br
+1       Reads to memory in the non-local NUMA domain
+.br
+0       Reads to memory in the local NUMA domain
+.br
+====    ========================================================
+.RE
 .TP
 .B \-p [EVTPIDS], \-\-mon-pid[=EVTPIDS]
 select top 10 most active (CPU utilizing) process ids to monitor
