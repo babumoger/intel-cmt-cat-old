@@ -170,6 +170,16 @@ PQOS_LOCAL int os_mon_remove_pids(const unsigned num_pids,
                                   const pid_t *pids,
                                   struct pqos_mon_data *group);
 
+/**
+ * @brief OS interface to remove \a pids from the monitoring group
+ *
+ * @param [in,out] group a pointer to monitoring structure
+ *
+ * @return Operations status
+ * @retval PQOS_RETVAL_OK on success
+ */
+PQOS_LOCAL int os_mon_event_configure(struct pqos_mon_data *group);
+
 #ifdef __cplusplus
 }
 #endif

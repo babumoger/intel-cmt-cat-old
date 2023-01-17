@@ -1744,3 +1744,106 @@ resctrl_mon_active(unsigned *monitoring_status)
         *monitoring_status = 0;
         return PQOS_RETVAL_OK;
 }
+
+/**
++ * @brief Read counter value from requested \a l3ids
++ *
++ * @param [in] File handler
++ * @param [in] l3ids l3ids to read from
++ * @param [in] l3ids_num number of l3ids
++ * @param [out] value counter value
++ *
++ * @return Operational status
++ * @retval PQOS_RETVAL_OK on success
++ */
+static int
+resctrl_event_config_update(FILE *fd,
+                            unsigned *l3ids,
+                            unsigned l3ids_num,
+                            unsigned value)
+{
+        const struct pqos_cpuinfo *cpu = _pqos_get_cpu();
+        int ret = PQOS_RETVAL_OK;
+        unsigned *l3cat_ids = NULL;
+        unsigned l3cat_id_num;
+        unsigned l3cat_id;
+        unsigned separator = 0;
+
+        ASSERT(resctrl_group != NULL);
+
+        if (l3ids == NULL) {
+                l3cat_ids = pqos_cpu_get_l3cat_ids(cpu, &l3cat_id_num);
+                if (l3cat_ids == NULL) {
+                        ret = PQOS_RETVAL_ERROR;
+                        goto resctrl_mon_read_exit;
+                }
+        } else {
+                l3cat_ids = l3ids;
+                l3cat_id_num = l3ids_num;
+        }
+
+        for (l3cat_id = 0; l3cat_id < l3cat_id_num; l3cat_id++) {
+                const unsigned l3id = l3cat_ids[l3cat_id];
+
+                if (separator)
+                        fprintf(fd, ";");
+                separator = 1;
+                fprintf(fd, "%u=%x", l3id, value);
+        }
+        fprintf(fd, "\n");
+
+resctrl_mon_read_exit:
+        if (l3ids == NULL && l3cat_ids != NULL)
+                free(l3cat_ids);
+
+        return ret;
+}
+
+/**
+ * @brief configure the event configuration for specific event
+ *
+ * @param group monitoring structure
+ *
+ * @retval PQOS_RETVAL_OK on success
+ */
+int
+resctrl_event_configure(struct pqos_mon_data *group)
+{
+        int ret = PQOS_RETVAL_OK;
+        unsigned *l3ids = group->intl->resctrl.l3id;
+        unsigned num_l3id = group->intl->resctrl.num_l3id;
+        FILE *fd;
+
+        if (group->event & PQOS_MON_EVENT_TMEM_BW) {
+                fd = pqos_fopen(
+                    RESCTRL_PATH_INFO_L3_MON "/mbm_total_bytes_config", "w");
+                if (fd == NULL) {
+                        LOG_ERROR("Failed to open mbm_total_bytes_config \n");
+                        return PQOS_RETVAL_ERROR;
+                }
+
+                ret = resctrl_event_config_update(
+                    fd, l3ids, num_l3id, group->mbm_total_bytes_config);
+
+                pqos_fclose(fd);
+                if (ret != PQOS_RETVAL_OK)
+                        goto resctrl_update_mon_configuration_exit;
+        }
+
+        if (group->event & PQOS_MON_EVENT_LMEM_BW) {
+                fd = pqos_fopen(
+                    RESCTRL_PATH_INFO_L3_MON "/mbm_local_bytes_config", "w");
+                if (fd == NULL) {
+                        LOG_ERROR("Failed to open mbm_local_bytes_config \n");
+                        return PQOS_RETVAL_ERROR;
+                }
+                ret = resctrl_event_config_update(
+                    fd, l3ids, num_l3id, group->mbm_local_bytes_config);
+                pqos_fclose(fd);
+                if (ret != PQOS_RETVAL_OK)
+                        goto resctrl_update_mon_configuration_exit;
+        }
+
+resctrl_update_mon_configuration_exit:
+        return ret;
+}
