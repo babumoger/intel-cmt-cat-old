@@ -139,6 +139,8 @@ hw_cap_mon_discover(struct pqos_cap_mon **r_mon, const struct pqos_cpuinfo *cpu)
         unsigned sz = 0, max_rmid = 0, l3_size = 0, num_events = 0;
         struct pqos_cap_mon *mon = NULL;
         enum pqos_mon_event uncore_events = (enum pqos_mon_event)0;
+        struct cpuid_out cpuid_0x80000020;
+        unsigned mon_configurable = 0;
 
         ASSERT(r_mon != NULL && cpu != NULL);
 
@@ -170,6 +172,12 @@ hw_cap_mon_discover(struct pqos_cap_mon **r_mon, const struct pqos_cpuinfo *cpu)
         if (ret != PQOS_RETVAL_OK) {
                 LOG_ERROR("Error reading L3 information!\n");
                 return PQOS_RETVAL_ERROR;
+        }
+
+        if (cpu->vendor == PQOS_VENDOR_AMD) {
+                lcpuid(0x80000020, 0x0, &cpuid_0x80000020);
+                if (cpuid_0x80000020.ebx & (1 << 3))
+                        mon_configurable = 1;
         }
 
         /**
@@ -231,6 +239,7 @@ hw_cap_mon_discover(struct pqos_cap_mon **r_mon, const struct pqos_cpuinfo *cpu)
         mon->mem_size = sz;
         mon->max_rmid = max_rmid;
         mon->l3_size = l3_size;
+        mon->mon_configurable = mon_configurable;
 
         {
                 const unsigned max_rmid = cpuid_0xf_1.ecx + 1;
