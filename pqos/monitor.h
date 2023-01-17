@@ -152,8 +152,10 @@ int monitor_uncore_mode(void);
 
 /**
  * @brief Stops monitoring on selected core(s)/pid(s)
+ *
+ * @param [in] cap_mon monitoring capability
  */
-void monitor_stop(void);
+void monitor_stop(const struct pqos_capability *const cap_mon);
 
 /**
  * @brief Starts monitoring on selected core(s)/pid(s)
