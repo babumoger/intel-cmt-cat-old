@@ -84,7 +84,8 @@ PQOS_LOCAL void resctrl_schemata_free(struct resctrl_schemata *schemata);
 PQOS_LOCAL int resctrl_schemata_reset(struct resctrl_schemata *schemata,
                                       const struct pqos_cap_l3ca *l3ca_cap,
                                       const struct pqos_cap_l2ca *l2ca_cap,
-                                      const struct pqos_cap_mba *mba_cap);
+                                      const struct pqos_cap_mba *mba_cap,
+                                      const struct pqos_cap_mba *smba_cap);
 
 /*
  * @brief Reads L2 class of service from schemata

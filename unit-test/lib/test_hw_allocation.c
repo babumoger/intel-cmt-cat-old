@@ -894,7 +894,7 @@ test_hw_alloc_reset_unsupported_all(void **state)
         will_return(__wrap_cpuinfo_get_config, &data->config);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_RESOURCE);
 }
 
@@ -909,11 +909,11 @@ test_hw_alloc_reset_unsupported_l3ca(void **state)
         will_return_maybe(__wrap_cpuinfo_get_config, &data->config);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ON, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_RESOURCE);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_OFF, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_RESOURCE);
 }
 
@@ -930,7 +930,7 @@ test_hw_alloc_reset_unsupported_l3cdp(void **state)
         will_return_always(__wrap_cpuinfo_get_config, &data->config);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ON, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_PARAM);
 }
 
@@ -945,11 +945,11 @@ test_hw_alloc_reset_unsupported_l2ca(void **state)
         will_return_always(__wrap_cpuinfo_get_config, &data->config);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ON,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_RESOURCE);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_OFF,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_RESOURCE);
 }
 
@@ -966,7 +966,7 @@ test_hw_alloc_reset_unsupported_l2cdp(void **state)
         will_return_always(__wrap_cpuinfo_get_config, &data->config);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ON,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_PARAM);
 }
 
@@ -981,11 +981,11 @@ test_hw_alloc_reset_unsupported_mba(void **state)
         will_return_always(__wrap_cpuinfo_get_config, &data->config);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_DEFAULT);
+                             PQOS_MBA_DEFAULT, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_RESOURCE);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_CTRL);
+                             PQOS_MBA_CTRL, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_RESOURCE);
 }
 
@@ -1002,7 +1002,7 @@ test_hw_alloc_reset_unsupported_mba_ctrl(void **state)
         will_return_always(__wrap_cpuinfo_get_config, &data->config);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_CTRL);
+                             PQOS_MBA_CTRL, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_PARAM);
 }
 
@@ -1044,7 +1044,7 @@ test_hw_alloc_reset_l3ca(void **state)
         expect_value(__wrap__pqos_cap_l3cdp_change, cdp, PQOS_REQUIRE_CDP_ANY);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_OK);
 
         if (l3cat_ids != NULL)
@@ -1094,7 +1094,7 @@ test_hw_alloc_reset_l3cdp_enable(void **state)
         expect_value(__wrap__pqos_cap_l3cdp_change, cdp, PQOS_REQUIRE_CDP_ON);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ON, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_OK);
 
         if (l3cat_ids != NULL)
@@ -1144,7 +1144,7 @@ test_hw_alloc_reset_l3cdp_disable(void **state)
         expect_value(__wrap__pqos_cap_l3cdp_change, cdp, PQOS_REQUIRE_CDP_OFF);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_OFF, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_OK);
 
         if (l3cat_ids != NULL)
@@ -1188,7 +1188,7 @@ test_hw_alloc_reset_l2ca(void **state)
         expect_value(__wrap__pqos_cap_l2cdp_change, cdp, PQOS_REQUIRE_CDP_ANY);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_OK);
 
         if (l2ids != NULL)
@@ -1237,7 +1237,7 @@ test_hw_alloc_reset_l2cdp_enable(void **state)
         expect_value(__wrap__pqos_cap_l2cdp_change, cdp, PQOS_REQUIRE_CDP_ON);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ON,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_OK);
 
         if (l2ids != NULL)
@@ -1286,7 +1286,7 @@ test_hw_alloc_reset_l2cdp_disable(void **state)
         expect_value(__wrap__pqos_cap_l2cdp_change, cdp, PQOS_REQUIRE_CDP_OFF);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_OFF,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_OK);
 
         if (l2ids != NULL)
@@ -1329,7 +1329,7 @@ test_hw_alloc_reset_mba(void **state)
         will_return(hw_alloc_reset_assoc, PQOS_RETVAL_OK);
 
         ret = hw_alloc_reset(PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ANY,
-                             PQOS_MBA_ANY);
+                             PQOS_MBA_ANY, PQOS_MBA_ANY);
         assert_int_equal(ret, PQOS_RETVAL_OK);
 
         if (mba_ids != NULL)

@@ -117,7 +117,8 @@ static struct pqos_api {
         /** Resets configuration of allocation technologies */
         int (*alloc_reset)(const enum pqos_cdp_config l3_cdp_cfg,
                            const enum pqos_cdp_config l2_cdp_cfg,
-                           const enum pqos_mba_config mba_cfg);
+                           const enum pqos_mba_config mba_cfg,
+                           const enum pqos_mba_config smba_cfg);
 
         /** Sets L3 classes of service */
         int (*l3ca_set)(const unsigned l3cat_id,
@@ -362,7 +363,8 @@ pqos_alloc_release_pid(const pid_t *task_array, const unsigned task_num)
 int
 pqos_alloc_reset(const enum pqos_cdp_config l3_cdp_cfg,
                  const enum pqos_cdp_config l2_cdp_cfg,
-                 const enum pqos_mba_config mba_cfg)
+                 const enum pqos_mba_config mba_cfg,
+                 const enum pqos_mba_config smba_cfg)
 {
         if (l3_cdp_cfg != PQOS_REQUIRE_CDP_ON &&
             l3_cdp_cfg != PQOS_REQUIRE_CDP_OFF &&
@@ -387,7 +389,14 @@ pqos_alloc_reset(const enum pqos_cdp_config l3_cdp_cfg,
                 return PQOS_RETVAL_PARAM;
         }
 
-        return API_CALL(alloc_reset, l3_cdp_cfg, l2_cdp_cfg, mba_cfg);
+        if (smba_cfg != PQOS_MBA_ANY && smba_cfg != PQOS_MBA_DEFAULT &&
+            smba_cfg != PQOS_MBA_CTRL) {
+                LOG_ERROR("Unrecognized SMBA configuration setting %d!\n",
+                          smba_cfg);
+                return PQOS_RETVAL_PARAM;
+        }
+
+        return API_CALL(alloc_reset, l3_cdp_cfg, l2_cdp_cfg, mba_cfg, smba_cfg);
 }
 
 unsigned *

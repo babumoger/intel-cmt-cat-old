@@ -643,10 +643,11 @@ test_pqos_alloc_reset_init(void **state __attribute__((unused)))
         enum pqos_cdp_config l3_cdp_cfg = PQOS_REQUIRE_CDP_ANY;
         enum pqos_cdp_config l2_cdp_cfg = PQOS_REQUIRE_CDP_ANY;
         enum pqos_mba_config mba_cfg = PQOS_MBA_ANY;
+        enum pqos_mba_config smba_cfg = PQOS_MBA_ANY;
 
         wrap_check_init(1, PQOS_RETVAL_INIT);
 
-        ret = pqos_alloc_reset(l3_cdp_cfg, l2_cdp_cfg, mba_cfg);
+        ret = pqos_alloc_reset(l3_cdp_cfg, l2_cdp_cfg, mba_cfg, smba_cfg);
         assert_int_equal(ret, PQOS_RETVAL_INIT);
 }
 
@@ -664,6 +665,8 @@ test_pqos_alloc_reset_os(void **state __attribute__((unused)))
             PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ON, PQOS_REQUIRE_CDP_OFF};
         enum pqos_mba_config mba_cfg[] = {PQOS_MBA_ANY, PQOS_MBA_DEFAULT,
                                           PQOS_MBA_CTRL};
+        enum pqos_mba_config smba_cfg[] = {PQOS_MBA_ANY, PQOS_MBA_DEFAULT,
+                                           PQOS_MBA_CTRL};
 
         for (l3 = 0; l3 < DIM(l3_cdp_cfg); ++l3) {
                 for (l2 = 0; l2 < DIM(l2_cdp_cfg); ++l2) {
@@ -679,9 +682,9 @@ test_pqos_alloc_reset_os(void **state __attribute__((unused)))
                                 will_return(__wrap_os_alloc_reset,
                                             PQOS_RETVAL_OK);
 
-                                ret = pqos_alloc_reset(l3_cdp_cfg[l3],
-                                                       l2_cdp_cfg[l2],
-                                                       mba_cfg[mba]);
+                                ret = pqos_alloc_reset(
+                                    l3_cdp_cfg[l3], l2_cdp_cfg[l2],
+                                    mba_cfg[mba], smba_cfg[mba]);
                                 assert_int_equal(ret, PQOS_RETVAL_OK);
                         }
                 }
@@ -702,6 +705,8 @@ test_pqos_alloc_reset_hw(void **state __attribute__((unused)))
             PQOS_REQUIRE_CDP_ANY, PQOS_REQUIRE_CDP_ON, PQOS_REQUIRE_CDP_OFF};
         enum pqos_mba_config mba_cfg[] = {PQOS_MBA_ANY, PQOS_MBA_DEFAULT,
                                           PQOS_MBA_CTRL};
+        enum pqos_mba_config smba_cfg[] = {PQOS_MBA_ANY, PQOS_MBA_DEFAULT,
+                                           PQOS_MBA_CTRL};
 
         for (l3 = 0; l3 < DIM(l3_cdp_cfg); ++l3) {
                 for (l2 = 0; l2 < DIM(l2_cdp_cfg); ++l2) {
@@ -717,9 +722,9 @@ test_pqos_alloc_reset_hw(void **state __attribute__((unused)))
                                 will_return(__wrap_hw_alloc_reset,
                                             PQOS_RETVAL_OK);
 
-                                ret = pqos_alloc_reset(l3_cdp_cfg[l3],
-                                                       l2_cdp_cfg[l2],
-                                                       mba_cfg[mba]);
+                                ret = pqos_alloc_reset(
+                                    l3_cdp_cfg[l3], l2_cdp_cfg[l2],
+                                    mba_cfg[mba], smba_cfg[mba]);
                                 assert_int_equal(ret, PQOS_RETVAL_OK);
                         }
                 }
@@ -733,14 +738,15 @@ test_pqos_alloc_reset_param(void **state __attribute__((unused)))
         enum pqos_cdp_config l3_cdp_cfg = PQOS_REQUIRE_CDP_ANY;
         enum pqos_cdp_config l2_cdp_cfg = PQOS_REQUIRE_CDP_ANY;
         enum pqos_mba_config mba_cfg = PQOS_MBA_ANY;
+        enum pqos_mba_config smba_cfg = PQOS_MBA_ANY;
 
-        ret = pqos_alloc_reset(-1, l2_cdp_cfg, mba_cfg);
+        ret = pqos_alloc_reset(-1, l2_cdp_cfg, mba_cfg, smba_cfg);
         assert_int_equal(ret, PQOS_RETVAL_PARAM);
 
-        ret = pqos_alloc_reset(l3_cdp_cfg, -1, mba_cfg);
+        ret = pqos_alloc_reset(l3_cdp_cfg, -1, mba_cfg, smba_cfg);
         assert_int_equal(ret, PQOS_RETVAL_PARAM);
 
-        ret = pqos_alloc_reset(l3_cdp_cfg, l2_cdp_cfg, -1);
+        ret = pqos_alloc_reset(l3_cdp_cfg, l2_cdp_cfg, -1, smba_cfg);
         assert_int_equal(ret, PQOS_RETVAL_PARAM);
 }
 

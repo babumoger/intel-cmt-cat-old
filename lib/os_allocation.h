@@ -170,7 +170,8 @@ PQOS_LOCAL int os_alloc_reset_cores(void);
  */
 PQOS_LOCAL int os_alloc_reset_schematas(const struct pqos_cap_l3ca *l3_cap,
                                         const struct pqos_cap_l2ca *l2_cap,
-                                        const struct pqos_cap_mba *mba_cap);
+                                        const struct pqos_cap_mba *mba_cap,
+                                        const struct pqos_cap_mba *smba_cap);
 
 /**
  * @brief Move all tasks to COS0 (default)
@@ -200,7 +201,8 @@ PQOS_LOCAL int os_alloc_reset_tasks(void);
  */
 PQOS_LOCAL int os_alloc_reset(const enum pqos_cdp_config l3_cdp_cfg,
                               const enum pqos_cdp_config l2_cdp_cfg,
-                              const enum pqos_mba_config mba_cfg);
+                              const enum pqos_mba_config mba_cfg,
+                              const enum pqos_mba_config smba_cfg);
 
 /**
  * @brief OS interface to set classes of service
